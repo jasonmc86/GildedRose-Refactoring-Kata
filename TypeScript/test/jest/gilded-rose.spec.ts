@@ -5,26 +5,32 @@ describe('Gilded Rose', () => {
     describe('Given regular item', () => {
       it('sellIn is lowered by 1', () => {
         const originalSellIn = 5;
-        const gildedRose = new GildedRose([new Item('foo', originalSellIn, 0)]);
-        const items = gildedRose.updateQuality();
-        expect(items[0].sellIn).toBe(originalSellIn - 1);
+        const actualItem = setupAndRunGildedRoseWithItemUnderTest(originalSellIn)
+
+        expect(actualItem.sellIn).toBe(originalSellIn - 1);
       });
 
       it('quality is lowered by 1', () => {
         const originalQuality = 5;
-        const gildedRose = new GildedRose([new Item('foo', 5, originalQuality)]);
-        const items = gildedRose.updateQuality();
-        expect(items[0].quality).toBe(originalQuality - 1);
+        const actualItem = setupAndRunGildedRoseWithItemUnderTest(undefined, originalQuality)
+
+        expect(actualItem.quality).toBe(originalQuality - 1);
       });
 
       it('once sellIn date is negative, quality degrades twice as fast', () => {
         const originalQuality = 5;
         const sellIn = -1;
-        const gildedRose = new GildedRose([new Item('foo', sellIn, originalQuality)]);
-        const items = gildedRose.updateQuality();
-        expect(items[0].quality).toBe(originalQuality - 2);
-      });
-    })
+        const actualItem = setupAndRunGildedRoseWithItemUnderTest(sellIn, originalQuality)
 
+        expect(actualItem.quality).toBe(originalQuality - 2);
+      });
+
+      const setupAndRunGildedRoseWithItemUnderTest = (sellIn: number = 5, quality: number = 5, name: string = 'foo') => {
+        const itemUnderTest = new Item(name, sellIn, quality);
+        const gildedRose = new GildedRose([itemUnderTest]);
+        const items = gildedRose.updateQuality();
+        return items[0];
+      };
+    })
   })
 });
