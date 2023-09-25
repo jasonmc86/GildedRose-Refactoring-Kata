@@ -18,15 +18,36 @@ export class GildedRose {
     this.items = items;
   }
 
-  updateRegularQuality(item: Item) {
+  updateItemQuality(item: Item, qualityDecreases: boolean = true, incrementBy: number = 1) {
     const multiplier = item.sellIn < 0 ? 2 : 1;
 
-    const updatedQuality = item.quality - 1 * multiplier;
+    const subtractOrAdd = qualityDecreases ? incrementBy : -incrementBy;
+    const updatedQuality = item.quality - (subtractOrAdd * multiplier);
 
-    item.quality = updatedQuality < 0 ? 0 : updatedQuality;
+    if (updatedQuality > 50) {
+      item.quality = 50
+    } else if (updatedQuality < 0) {
+      item.quality = 0
+    } else {
+      item.quality = updatedQuality
+    }
   }
 
-  updateRegularSellIn(item: Item) {
+  updateBackstageItemQuality(item: Item) {
+    if (item.sellIn < 0) {
+      item.quality = 0;
+    } else {
+      let incrementBy = 1;
+      if (item.sellIn <= 5) {
+        incrementBy = 3
+      } else if (item.sellIn <= 10) {
+        incrementBy = 2
+      }
+      this.updateItemQuality(item, false, incrementBy);
+    }
+  }
+
+  updateItemSellIn(item: Item) {
     item.sellIn--;
   }
 
@@ -36,43 +57,15 @@ export class GildedRose {
       const isRegularItem = !this.irregularItems.includes(currentItem.name);
 
       if (currentItem.name !== 'Sulfuras, Hand of Ragnaros') {
-        this.updateRegularSellIn(currentItem);
+        this.updateItemSellIn(currentItem);
       }
 
-      if (isRegularItem) {
-        this.updateRegularQuality(currentItem);
-      }
-
-      if (this.items[i].name != 'Aged Brie' && this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-
-      } else {
-        if (this.items[i].quality < 50) {
-          this.items[i].quality = this.items[i].quality + 1
-          if (this.items[i].name == 'Backstage passes to a TAFKAL80ETC concert') {
-            if (this.items[i].sellIn < 11) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1
-              }
-            }
-            if (this.items[i].sellIn < 6) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1
-              }
-            }
-          }
-        }
-      }
-      if (this.items[i].sellIn < 0) {
-        if (this.items[i].name != 'Aged Brie') {
-          if (this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-
-          } else {
-            this.items[i].quality = this.items[i].quality - this.items[i].quality
-          }
+      // updating quality
+      if(currentItem.name !== 'Sulfuras, Hand of Ragnaros') {
+        if (currentItem.name === 'Backstage passes to a TAFKAL80ETC concert') {
+          this.updateBackstageItemQuality(currentItem);
         } else {
-          if (this.items[i].quality < 50) {
-            this.items[i].quality = this.items[i].quality + 1
-          }
+          this.updateItemQuality(currentItem, isRegularItem);
         }
       }
     }
