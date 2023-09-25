@@ -2,6 +2,47 @@ import { Item, GildedRose } from '@/gilded-rose';
 
 describe('Gilded Rose', () => {
   describe('updateQuality', () => {
+    describe('Given starting seed items', () => {
+      it('results in resulting items after 32 days', () => {
+        const actualItems = setupAndRunGildedRoseWithItemsTimes(startingSeedItems, 30)
+        expect(actualItems).toStrictEqual(expectedItemsAfter30Days);
+      })
+
+      const setupAndRunGildedRoseWithItemsTimes = (items: Item[], times: number) => {
+        const gildedRose = new GildedRose(items);
+
+        for(let i = 0; i < times; i++) {
+          gildedRose.updateQuality();
+        }
+
+        return gildedRose.items;
+      };
+
+      const startingSeedItems = [
+        new Item('+5 Dexterity Vest',10, 20),
+        new Item('Aged Brie',2, 0),
+        new Item('Elixir of the Mongoose',5, 7),
+        new Item('Sulfuras, Hand of Ragnaros',0, 80),
+        new Item('Sulfuras, Hand of Ragnaros',-1, 80),
+        new Item('Backstage passes to a TAFKAL80ETC',15, 20),
+        new Item('Backstage passes to a TAFKAL80ETC',10, 49),
+        new Item('Backstage passes to a TAFKAL80ETC',5, 49),
+        new Item('Conjured Mana Cake',3, 6),
+      ];
+
+      const expectedItemsAfter30Days = [
+        new Item('+5 Dexterity Vest',-20, 0),
+        new Item('Aged Brie',-28, 50),
+        new Item('Elixir of the Mongoose',-25, 0),
+        new Item('Sulfuras, Hand of Ragnaros',0, 80),
+        new Item('Sulfuras, Hand of Ragnaros',-1, 80),
+        new Item('Backstage passes to a TAFKAL80ETC',-15, 0),
+        new Item('Backstage passes to a TAFKAL80ETC',-20, 0),
+        new Item('Backstage passes to a TAFKAL80ETC',-25, 0),
+        new Item('Conjured Mana Cake',-27, 0), // TODO: UPDATE ME TO REFLECT ACTUAL EXPECTATION
+      ];
+    })
+
     describe('Given any item', () => {
       it('sellIn is lowered by 1', () => {
         const originalSellIn = 5;
